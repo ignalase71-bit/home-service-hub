@@ -14,16 +14,534 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      customers: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          distance_km: number | null
+          email: string | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          notes: string | null
+          phone: string | null
+          postal_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          distance_km?: number | null
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          distance_km?: number | null
+          email?: string | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          postal_code?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      installer_blocks: {
+        Row: {
+          created_at: string
+          end_date: string
+          end_time: string | null
+          id: string
+          installer_id: string
+          kind: string
+          reason: string | null
+          start_date: string
+          start_time: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          end_time?: string | null
+          id?: string
+          installer_id: string
+          kind?: string
+          reason?: string | null
+          start_date: string
+          start_time?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          end_time?: string | null
+          id?: string
+          installer_id?: string
+          kind?: string
+          reason?: string | null
+          start_date?: string
+          start_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installer_blocks_installer_id_fkey"
+            columns: ["installer_id"]
+            isOneToOne: false
+            referencedRelation: "installers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      installer_schedules: {
+        Row: {
+          created_at: string
+          end_time: string
+          id: string
+          installer_id: string
+          start_time: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          end_time: string
+          id?: string
+          installer_id: string
+          start_time: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          end_time?: string
+          id?: string
+          installer_id?: string
+          start_time?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installer_schedules_installer_id_fkey"
+            columns: ["installer_id"]
+            isOneToOne: false
+            referencedRelation: "installers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      installers: {
+        Row: {
+          active: boolean
+          color: string
+          created_at: string
+          email: string | null
+          express_enabled: boolean
+          hourly_cost: number
+          id: string
+          max_daily_minutes: number
+          max_visit_minutes: number
+          name: string
+          phone: string | null
+          specialties: string[]
+          updated_at: string
+          zones: string[]
+        }
+        Insert: {
+          active?: boolean
+          color?: string
+          created_at?: string
+          email?: string | null
+          express_enabled?: boolean
+          hourly_cost?: number
+          id?: string
+          max_daily_minutes?: number
+          max_visit_minutes?: number
+          name: string
+          phone?: string | null
+          specialties?: string[]
+          updated_at?: string
+          zones?: string[]
+        }
+        Update: {
+          active?: boolean
+          color?: string
+          created_at?: string
+          email?: string | null
+          express_enabled?: boolean
+          hourly_cost?: number
+          id?: string
+          max_daily_minutes?: number
+          max_visit_minutes?: number
+          name?: string
+          phone?: string | null
+          specialties?: string[]
+          updated_at?: string
+          zones?: string[]
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          active: boolean
+          addon_duration_minutes: number
+          base_price: number
+          category_id: string
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          emoji: string | null
+          express_available: boolean
+          express_fee: number
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          addon_duration_minutes?: number
+          base_price?: number
+          category_id: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          emoji?: string | null
+          express_available?: boolean
+          express_fee?: number
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+          specialty: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          addon_duration_minutes?: number
+          base_price?: number
+          category_id?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          emoji?: string | null
+          express_available?: boolean
+          express_fee?: number
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+          specialty?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: Json
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      visit_services: {
+        Row: {
+          base_price: number
+          created_at: string
+          duration_minutes: number
+          express: boolean
+          express_fee: number
+          extras: number
+          id: string
+          installer_cost: number
+          notes: string | null
+          quantity: number
+          service_id: string | null
+          service_name: string
+          specialty: string | null
+          subtotal: number
+          visit_id: string
+        }
+        Insert: {
+          base_price?: number
+          created_at?: string
+          duration_minutes?: number
+          express?: boolean
+          express_fee?: number
+          extras?: number
+          id?: string
+          installer_cost?: number
+          notes?: string | null
+          quantity?: number
+          service_id?: string | null
+          service_name: string
+          specialty?: string | null
+          subtotal?: number
+          visit_id: string
+        }
+        Update: {
+          base_price?: number
+          created_at?: string
+          duration_minutes?: number
+          express?: boolean
+          express_fee?: number
+          extras?: number
+          id?: string
+          installer_cost?: number
+          notes?: string | null
+          quantity?: number
+          service_id?: string | null
+          service_name?: string
+          specialty?: string | null
+          subtotal?: number
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_services_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visits: {
+        Row: {
+          address: string | null
+          allow_overlap: boolean
+          city: string | null
+          created_at: string
+          customer_id: string
+          distance_fee: number
+          distance_km: number
+          end_time: string
+          express: boolean
+          express_total: number
+          id: string
+          installer_cost: number
+          installer_id: string | null
+          latitude: number | null
+          longitude: number | null
+          notes: string | null
+          payment_status: string
+          services_total: number
+          start_time: string
+          status: string
+          total: number
+          updated_at: string
+          visit_date: string
+          visit_number: number
+        }
+        Insert: {
+          address?: string | null
+          allow_overlap?: boolean
+          city?: string | null
+          created_at?: string
+          customer_id: string
+          distance_fee?: number
+          distance_km?: number
+          end_time: string
+          express?: boolean
+          express_total?: number
+          id?: string
+          installer_cost?: number
+          installer_id?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          payment_status?: string
+          services_total?: number
+          start_time: string
+          status?: string
+          total?: number
+          updated_at?: string
+          visit_date: string
+          visit_number?: number
+        }
+        Update: {
+          address?: string | null
+          allow_overlap?: boolean
+          city?: string | null
+          created_at?: string
+          customer_id?: string
+          distance_fee?: number
+          distance_km?: number
+          end_time?: string
+          express?: boolean
+          express_total?: number
+          id?: string
+          installer_cost?: number
+          installer_id?: string | null
+          latitude?: number | null
+          longitude?: number | null
+          notes?: string | null
+          payment_status?: string
+          services_total?: number
+          start_time?: string
+          status?: string
+          total?: number
+          updated_at?: string
+          visit_date?: string
+          visit_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visits_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visits_installer_id_fkey"
+            columns: ["installer_id"]
+            isOneToOne: false
+            referencedRelation: "installers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      zones: {
+        Row: {
+          active: boolean
+          created_at: string
+          fee: number
+          id: string
+          max_km: number
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          fee?: number
+          id?: string
+          max_km: number
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          fee?: number
+          id?: string
+          max_km?: number
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "staff"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +668,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "staff"],
+    },
   },
 } as const
