@@ -203,7 +203,7 @@ export const isBlocked = (
 
 export const installerMatches = (
   installer: InstallerLite,
-  requirements: { specialties: string[]; zone?: string | null },
+  requirements: { specialties: string[]; zone?: string | null | undefined },
 ): boolean => {
   if (!installer.active) return false;
   const hasSpecialties = requirements.specialties.every((s) =>
