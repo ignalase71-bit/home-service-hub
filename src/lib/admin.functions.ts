@@ -148,12 +148,15 @@ export const adminUpdateVisit = createServerFn({ method: "POST" })
     const { assertAdmin } = await import("./admin.server");
     const { translateDbError } = await import("./visits.server");
     await assertAdmin(context.supabase, context.userId);
-    const patch: Record<string, unknown> = {};
-    if (data.status) patch["status"] = data.status;
-    if (data.paymentStatus) patch["payment_status"] = data.paymentStatus;
-    if (data.installerCost !== undefined) patch["installer_cost"] = data.installerCost;
-    if (data.notes !== undefined) patch["notes"] = data.notes;
-    const { error } = await context.supabase.from("visits").update(patch).eq("id", data.visitId);
+    const { error } = await context.supabase
+      .from("visits")
+      .update({
+        ...(data.status ? { status: data.status } : {}),
+        ...(data.paymentStatus ? { payment_status: data.paymentStatus } : {}),
+        ...(data.installerCost !== undefined ? { installer_cost: data.installerCost } : {}),
+        ...(data.notes !== undefined ? { notes: data.notes } : {}),
+      })
+      .eq("id", data.visitId);
     if (error) throw new Error(translateDbError(error.message));
     return { ok: true as const };
   });

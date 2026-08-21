@@ -71,8 +71,8 @@ export const availabilityMatrix = async (
     startTime: string;
     endTime: string;
     requiredSpecialties: string[];
-    zone?: string | null;
-    excludeVisitId?: string | null;
+    zone?: string | null | undefined;
+    excludeVisitId?: string | null | undefined;
   },
 ) => {
   const [installers, schedules, blocks, visits] = await Promise.all([
