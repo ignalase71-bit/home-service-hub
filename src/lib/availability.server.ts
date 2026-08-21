@@ -172,11 +172,11 @@ type BookingInput = {
   customer: {
     name: string;
     phone: string;
-    email?: string;
+    email?: string | undefined;
     address: string;
     city: string;
-    postalCode?: string;
-    notes?: string;
+    postalCode?: string | undefined;
+    notes?: string | undefined;
   };
   serviceIds: string[];
   distanceKm: number;
