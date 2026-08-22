@@ -301,19 +301,21 @@ function BookingPage() {
             <p className="text-eyebrow">Paso 3</p>
             <h2 className="text-xl font-bold">Tus datos</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              {[
-                ["name", "Nombre y apellidos"],
-                ["phone", "Teléfono"],
-                ["email", "Email (opcional)"],
-                ["address", "Dirección"],
-                ["city", "Localidad"],
-                ["postalCode", "Código postal"],
-              ].map(([key, label]) => (
+              {(
+                [
+                  ["name", "Nombre y apellidos"],
+                  ["phone", "Teléfono"],
+                  ["email", "Email (opcional)"],
+                  ["address", "Dirección"],
+                  ["city", "Localidad"],
+                  ["postalCode", "Código postal"],
+                ] as const
+              ).map(([key, label]) => (
                 <div key={key} className="space-y-2">
                   <Label htmlFor={key}>{label}</Label>
                   <Input
                     id={key}
-                    value={customer[key as keyof typeof customer]}
+                    value={customer[key]}
                     onChange={(e) => setCustomer({ ...customer, [key]: e.target.value })}
                   />
                 </div>
