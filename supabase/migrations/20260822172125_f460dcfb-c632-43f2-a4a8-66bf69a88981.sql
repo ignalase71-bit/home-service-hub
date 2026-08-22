@@ -1,0 +1,1 @@
+revoke execute on function public.bootstrap_first_admin() from public, anon, authenticated;
