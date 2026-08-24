@@ -228,6 +228,156 @@ export type Database = {
         }
         Relationships: []
       }
+      request_items: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          express: boolean
+          express_fee: number
+          id: string
+          quantity: number
+          request_id: string
+          service_id: string | null
+          service_name: string
+          specialty: string | null
+          subtotal: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          express?: boolean
+          express_fee?: number
+          id?: string
+          quantity?: number
+          request_id: string
+          service_id?: string | null
+          service_name: string
+          specialty?: string | null
+          subtotal?: number
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          express?: boolean
+          express_fee?: number
+          id?: string
+          quantity?: number
+          request_id?: string
+          service_id?: string | null
+          service_name?: string
+          specialty?: string | null
+          subtotal?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "request_items_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "request_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      requests: {
+        Row: {
+          chosen_at: string | null
+          chosen_slot: string | null
+          created_at: string
+          customer_id: string
+          distance_fee: number
+          distance_km: number
+          duration_minutes: number
+          express: boolean
+          express_total: number
+          id: string
+          notes: string | null
+          proposal_note: string | null
+          proposed_slot_1: string | null
+          proposed_slot_2: string | null
+          proposed_slot_3: string | null
+          public_token: string
+          request_number: number
+          services_total: number
+          status: string
+          total: number
+          updated_at: string
+          visit_id: string | null
+        }
+        Insert: {
+          chosen_at?: string | null
+          chosen_slot?: string | null
+          created_at?: string
+          customer_id: string
+          distance_fee?: number
+          distance_km?: number
+          duration_minutes?: number
+          express?: boolean
+          express_total?: number
+          id?: string
+          notes?: string | null
+          proposal_note?: string | null
+          proposed_slot_1?: string | null
+          proposed_slot_2?: string | null
+          proposed_slot_3?: string | null
+          public_token?: string
+          request_number?: number
+          services_total?: number
+          status?: string
+          total?: number
+          updated_at?: string
+          visit_id?: string | null
+        }
+        Update: {
+          chosen_at?: string | null
+          chosen_slot?: string | null
+          created_at?: string
+          customer_id?: string
+          distance_fee?: number
+          distance_km?: number
+          duration_minutes?: number
+          express?: boolean
+          express_total?: number
+          id?: string
+          notes?: string | null
+          proposal_note?: string | null
+          proposed_slot_1?: string | null
+          proposed_slot_2?: string | null
+          proposed_slot_3?: string | null
+          public_token?: string
+          request_number?: number
+          services_total?: number
+          status?: string
+          total?: number
+          updated_at?: string
+          visit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "requests_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       services: {
         Row: {
           active: boolean
