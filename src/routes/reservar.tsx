@@ -114,37 +114,46 @@ function BookingPage() {
 
   if (confirmation) {
     return (
-      <main className="mx-auto max-w-2xl px-6 py-20">
-        <div className="panel p-8 text-center">
-          <p className="text-eyebrow">Solicitud recibida</p>
-          <h1 className="mt-2 text-3xl font-bold">
-            Visita {formatVisitNumber(confirmation.visitNumber)}
-          </h1>
-          <p className="mt-4 text-muted-foreground">
-            {formatDateES(confirmation.date)} ·{" "}
-            {formatRange(confirmation.startTime, confirmation.endTime)}
-          </p>
-          <p className="mt-2 font-display text-2xl font-bold text-primary">
-            {formatEuro(confirmation.total)}
-          </p>
-          <p className="mt-4 text-sm text-muted-foreground">
-            Te confirmaremos por teléfono la asignación del técnico. Todos los trabajos elegidos se
-            realizarán en esta única visita.
-          </p>
-          <Button asChild className="mt-6">
-            <Link to="/">Volver al inicio</Link>
-          </Button>
-        </div>
-      </main>
+      <div className="flex min-h-screen flex-col">
+        <SiteHeader />
+        <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-20">
+          <div className="panel p-8 text-center">
+            <p className="text-eyebrow">Solicitud recibida</p>
+            <h1 className="text-display mt-2 text-3xl">
+              Visita {formatVisitNumber(confirmation.visitNumber)}
+            </h1>
+            <p className="mt-4 text-muted-foreground">
+              {formatDateES(confirmation.date)} ·{" "}
+              {formatRange(confirmation.startTime, confirmation.endTime)}
+            </p>
+            <p className="mt-2 font-display text-2xl font-semibold">
+              {formatEuro(confirmation.total)}
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Te confirmaremos por teléfono la asignación del técnico. Todos los trabajos elegidos se
+              realizarán en esta única visita.
+            </p>
+            <Button asChild className="mt-6 rounded-full px-6">
+              <Link to="/">Volver al inicio</Link>
+            </Button>
+          </div>
+        </main>
+        <SiteFooter />
+      </div>
     );
   }
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <Link to="/" className="text-sm text-muted-foreground underline">
-        ← Inicio
-      </Link>
-      <h1 className="mt-4 text-3xl font-bold">Reserva tu instalación</h1>
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-14">
+      <p className="text-eyebrow">Configurador</p>
+      <h1 className="text-display mt-3 text-4xl">Reserva tu instalación</h1>
+      <p className="mt-3 max-w-xl text-muted-foreground">
+        Elige los servicios, comprueba huecos reales de agenda y confirma con el precio final a la
+        vista.
+      </p>
+
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.4fr_1fr]">
         <div className="space-y-8">
