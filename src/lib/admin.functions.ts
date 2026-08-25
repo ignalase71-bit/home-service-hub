@@ -461,3 +461,115 @@ export const adminDeleteVisit = createServerFn({ method: "POST" })
     await context.supabase.from("visits").delete().eq("id", data.visitId);
     return { ok: true as const };
   });
+
+/* ------------------------------ Catálogo -------------------------------- */
+
+const serviceInputSchema = z.object({
+  category_id: z.string().uuid(),
+  slug: z.string().min(2),
+  name: z.string().min(2),
+  description: z.string().nullable().optional(),
+  specialty: z.string().min(2),
+  base_price: z.number().min(0),
+  duration_minutes: z.number().int().min(15).max(1440),
+  addon_duration_minutes: z.number().int().min(0).max(1440),
+  express_available: z.boolean(),
+  express_fee: z.number().min(0),
+  emoji: z.string().nullable().optional(),
+  sort_order: z.number().int().min(0),
+  active: z.boolean(),
+});
+
+export const adminCatalog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { loadAdminCatalog } = await import("./admin-catalog.server");
+    await assertAdmin(context.supabase, context.userId);
+    return loadAdminCatalog(context.supabase);
+  });
+
+export const adminCreateService = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => serviceInputSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { createService } = await import("./admin-catalog.server");
+    await assertAdmin(context.supabase, context.userId);
+    return createService(context.supabase, data);
+  });
+
+export const adminUpdateService = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), values: serviceInputSchema.partial() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { updateService } = await import("./admin-catalog.server");
+    await assertAdmin(context.supabase, context.userId);
+    return updateService(context.supabase, data.id, data.values);
+  });
+
+export const adminSetServiceActive = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ id: z.string().uuid(), active: z.boolean() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { setServiceActive } = await import("./admin-catalog.server");
+    await assertAdmin(context.supabase, context.userId);
+    return setServiceActive(context.supabase, data.id, data.active);
+  });
+
+export const adminDeleteService = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { deleteService } = await import("./admin-catalog.server");
+    await assertAdmin(context.supabase, context.userId);
+    return deleteService(context.supabase, data.id);
+  });
+
+/* ----------------------------- Solicitudes ------------------------------ */
+
+export const adminRequests = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { loadRequests } = await import("./admin-requests.server");
+    await assertAdmin(context.supabase, context.userId);
+    return loadRequests(context.supabase);
+  });
+
+export const adminProposeSlots = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        requestId: z.string().uuid(),
+        slots: z.array(z.string()).max(3),
+        note: z.string().nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { proposeSlots } = await import("./admin-requests.server");
+    await assertAdmin(context.supabase, context.userId);
+    return proposeSlots(context.supabase, data);
+  });
+
+export const adminUpdateRequestStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({ requestId: z.string().uuid(), status: z.string().min(2) }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { updateRequestStatus } = await import("./admin-requests.server");
+    await assertAdmin(context.supabase, context.userId);
+    return updateRequestStatus(context.supabase, data.requestId, data.status);
+  });
