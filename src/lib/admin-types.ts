@@ -133,3 +133,51 @@ export const WEEKDAYS = [
   "Viernes",
   "Sábado",
 ];
+
+export const REQUEST_STATUS_LABELS: Record<string, string> = {
+  quote_requested: "Presupuesto solicitado",
+  quote_sent: "Presupuesto enviado",
+  quote_accepted: "Presupuesto aceptado",
+  pending_slots: "Pendiente de proponer fechas",
+  slots_proposed: "Fechas propuestas",
+  slot_chosen: "Fecha elegida",
+  confirmed: "Confirmado",
+  in_progress: "En proceso",
+  done: "Finalizado",
+  cancelled: "Cancelado",
+};
+
+export const REQUEST_STATUS_ORDER = Object.keys(REQUEST_STATUS_LABELS);
+
+export type AdminRequestItem = {
+  id: string;
+  service_name: string;
+  quantity: number;
+  unit_price: number;
+  express: boolean;
+  express_fee: number;
+  subtotal: number;
+};
+
+export type AdminRequest = {
+  id: string;
+  request_number: number;
+  public_token: string;
+  status: string;
+  express: boolean;
+  distance_km: number;
+  distance_fee: number;
+  services_total: number;
+  express_total: number;
+  total: number;
+  duration_minutes: number;
+  proposed_slot_1: string | null;
+  proposed_slot_2: string | null;
+  proposed_slot_3: string | null;
+  proposal_note: string | null;
+  chosen_slot: string | null;
+  notes: string | null;
+  created_at: string;
+  customer: AdminCustomer | null;
+  items: AdminRequestItem[];
+};
