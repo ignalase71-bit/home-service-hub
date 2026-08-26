@@ -17,6 +17,7 @@ import { Route as PreciosRouteImport } from './routes/precios'
 import { Route as ReservarRouteImport } from './routes/reservar'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as SolicitudTokenRouteImport } from './routes/solicitud.$token'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -57,6 +58,11 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const SolicitudTokenRoute = SolicitudTokenRouteImport.update({
+  id: '/solicitud/$token',
+  path: '/solicitud/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/reservar': typeof ReservarRoute
   '/servicios': typeof ServiciosRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/solicitud/$token': typeof SolicitudTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/reservar': typeof ReservarRoute
   '/servicios': typeof ServiciosRoute
   '/admin': typeof AuthenticatedAdminRoute
+  '/solicitud/$token': typeof SolicitudTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -86,14 +94,29 @@ export interface FileRoutesById {
   '/reservar': typeof ReservarRoute
   '/servicios': typeof ServiciosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/solicitud/$token': typeof SolicitudTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/ikea' | '/precios' | '/reservar' | '/servicios' | '/admin'
+    | '/'
+    | '/auth'
+    | '/ikea'
+    | '/precios'
+    | '/reservar'
+    | '/servicios'
+    | '/admin'
+    | '/solicitud/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/ikea' | '/precios' | '/reservar' | '/servicios' | '/admin'
+    | '/'
+    | '/auth'
+    | '/ikea'
+    | '/precios'
+    | '/reservar'
+    | '/servicios'
+    | '/admin'
+    | '/solicitud/$token'
   id:
     | '__root__'
     | '/'
@@ -104,6 +127,7 @@ export interface FileRouteTypes {
     | '/reservar'
     | '/servicios'
     | '/_authenticated/admin'
+    | '/solicitud/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -114,6 +138,7 @@ export interface RootRouteChildren {
   PreciosRoute: typeof PreciosRoute
   ReservarRoute: typeof ReservarRoute
   ServiciosRoute: typeof ServiciosRoute
+  SolicitudTokenRoute: typeof SolicitudTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -174,6 +199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/solicitud/$token': {
+      id: '/solicitud/$token'
+      path: '/solicitud/$token'
+      fullPath: '/solicitud/$token'
+      preLoaderRoute: typeof SolicitudTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -196,6 +228,7 @@ const rootRouteChildren: RootRouteChildren = {
   PreciosRoute: PreciosRoute,
   ReservarRoute: ReservarRoute,
   ServiciosRoute: ServiciosRoute,
+  SolicitudTokenRoute: SolicitudTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
