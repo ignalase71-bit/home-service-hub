@@ -4,14 +4,14 @@ export type ServiceInput = {
   category_id: string;
   slug: string;
   name: string;
-  description?: string | null;
+  description?: string | null | undefined;
   specialty: string;
   base_price: number;
   duration_minutes: number;
   addon_duration_minutes: number;
   express_available: boolean;
   express_fee: number;
-  emoji?: string | null;
+  emoji?: string | null | undefined;
   sort_order: number;
   active: boolean;
 };
@@ -31,7 +31,9 @@ export const createService = async (db: Db, input: ServiceInput) => {
   return { id: data.id as string };
 };
 
-export const updateService = async (db: Db, id: string, input: Partial<ServiceInput>) => {
+export type ServiceUpdate = { [K in keyof ServiceInput]?: ServiceInput[K] | undefined };
+
+export const updateService = async (db: Db, id: string, input: ServiceUpdate) => {
   const { error } = await db.from("services").update(input).eq("id", id);
   if (error) throw new Error(error.message);
   return { ok: true as const };
