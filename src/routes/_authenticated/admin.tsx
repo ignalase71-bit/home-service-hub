@@ -6,6 +6,9 @@ import { adminOverview } from "@/lib/admin.functions";
 import { CalendarBoard, type CalendarView } from "@/components/admin/CalendarBoard";
 import type { AdminInstaller, AdminVisit } from "@/lib/admin-types";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RequestsManager } from "@/components/admin/RequestsManager";
+import { ServicesManager } from "@/components/admin/ServicesManager";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -45,6 +48,29 @@ const VIEW_LABEL: Record<CalendarView, string> = {
 };
 
 function AdminPage() {
+  return (
+    <main className="mx-auto max-w-7xl space-y-6 p-6">
+      <Tabs defaultValue="agenda">
+        <TabsList>
+          <TabsTrigger value="agenda">Agenda</TabsTrigger>
+          <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
+          <TabsTrigger value="servicios">Trabajos</TabsTrigger>
+        </TabsList>
+        <TabsContent value="agenda" className="mt-6">
+          <AgendaPanel />
+        </TabsContent>
+        <TabsContent value="solicitudes" className="mt-6">
+          <RequestsManager />
+        </TabsContent>
+        <TabsContent value="servicios" className="mt-6">
+          <ServicesManager />
+        </TabsContent>
+      </Tabs>
+    </main>
+  );
+}
+
+function AgendaPanel() {
   const overview = useServerFn(adminOverview);
   const [view, setView] = useState<CalendarView>("day");
   const [date, setDate] = useState(toISO(new Date()));
@@ -73,7 +99,7 @@ function AdminPage() {
   const visits = (data?.visits ?? []) as AdminVisit[];
 
   return (
-    <main className="mx-auto max-w-7xl space-y-6 p-6">
+    <div className="space-y-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-3xl">Agenda de instaladores</h1>
@@ -149,6 +175,6 @@ function AdminPage() {
           </p>
         </section>
       ) : null}
-    </main>
+    </div>
   );
 }
