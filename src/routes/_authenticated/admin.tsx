@@ -6,6 +6,9 @@ import { adminOverview } from "@/lib/admin.functions";
 import { CalendarBoard, type CalendarView } from "@/components/admin/CalendarBoard";
 import type { AdminInstaller, AdminVisit } from "@/lib/admin-types";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { RequestsManager } from "@/components/admin/RequestsManager";
+import { ServicesManager } from "@/components/admin/ServicesManager";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
