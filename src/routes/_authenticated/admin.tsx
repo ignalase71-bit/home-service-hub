@@ -45,6 +45,29 @@ const VIEW_LABEL: Record<CalendarView, string> = {
 };
 
 function AdminPage() {
+  return (
+    <main className="mx-auto max-w-7xl space-y-6 p-6">
+      <Tabs defaultValue="agenda">
+        <TabsList>
+          <TabsTrigger value="agenda">Agenda</TabsTrigger>
+          <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
+          <TabsTrigger value="servicios">Trabajos</TabsTrigger>
+        </TabsList>
+        <TabsContent value="agenda" className="mt-6">
+          <AgendaPanel />
+        </TabsContent>
+        <TabsContent value="solicitudes" className="mt-6">
+          <RequestsManager />
+        </TabsContent>
+        <TabsContent value="servicios" className="mt-6">
+          <ServicesManager />
+        </TabsContent>
+      </Tabs>
+    </main>
+  );
+}
+
+function AgendaPanel() {
   const overview = useServerFn(adminOverview);
   const [view, setView] = useState<CalendarView>("day");
   const [date, setDate] = useState(toISO(new Date()));
