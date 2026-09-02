@@ -573,3 +573,52 @@ export const adminUpdateRequestStatus = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     return updateRequestStatus(context.supabase, data.requestId, data.status);
   });
+
+/* ---------------------------- Instaladores ------------------------------ */
+
+export const adminInstallersPanel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { loadInstallersPanel } = await import("./admin-installers.server");
+    await assertAdmin(context.supabase, context.userId);
+    return loadInstallersPanel(context.supabase);
+  });
+
+export const adminEarliestInstallerSlots = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({ requestId: z.string().uuid(), days: z.number().int().min(1).max(45).optional() })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { earliestInstallerSlots } = await import("./admin-installers.server");
+    await assertAdmin(context.supabase, context.userId);
+    return earliestInstallerSlots(context.supabase, data);
+  });
+
+export const adminAssignRequestInstaller = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({ requestId: z.string().uuid(), installerId: z.string().uuid().nullable() })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { assignRequestInstaller } = await import("./admin-installers.server");
+    await assertAdmin(context.supabase, context.userId);
+    return assignRequestInstaller(context.supabase, data);
+  });
+
+export const adminDeleteInstaller = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { deleteInstaller } = await import("./admin-installers.server");
+    await assertAdmin(context.supabase, context.userId);
+    return deleteInstaller(context.supabase, data.id);
+  });
