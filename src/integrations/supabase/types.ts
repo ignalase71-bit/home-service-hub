@@ -290,6 +290,7 @@ export type Database = {
       }
       requests: {
         Row: {
+          assigned_at: string | null
           chosen_at: string | null
           chosen_slot: string | null
           created_at: string
@@ -300,6 +301,7 @@ export type Database = {
           express: boolean
           express_total: number
           id: string
+          installer_id: string | null
           notes: string | null
           proposal_note: string | null
           proposed_slot_1: string | null
@@ -314,6 +316,7 @@ export type Database = {
           visit_id: string | null
         }
         Insert: {
+          assigned_at?: string | null
           chosen_at?: string | null
           chosen_slot?: string | null
           created_at?: string
@@ -324,6 +327,7 @@ export type Database = {
           express?: boolean
           express_total?: number
           id?: string
+          installer_id?: string | null
           notes?: string | null
           proposal_note?: string | null
           proposed_slot_1?: string | null
@@ -338,6 +342,7 @@ export type Database = {
           visit_id?: string | null
         }
         Update: {
+          assigned_at?: string | null
           chosen_at?: string | null
           chosen_slot?: string | null
           created_at?: string
@@ -348,6 +353,7 @@ export type Database = {
           express?: boolean
           express_total?: number
           id?: string
+          installer_id?: string | null
           notes?: string | null
           proposal_note?: string | null
           proposed_slot_1?: string | null
@@ -367,6 +373,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "requests_installer_id_fkey"
+            columns: ["installer_id"]
+            isOneToOne: false
+            referencedRelation: "installers"
             referencedColumns: ["id"]
           },
           {
