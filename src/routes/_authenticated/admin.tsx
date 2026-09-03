@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RequestsManager } from "@/components/admin/RequestsManager";
 import { ServicesManager } from "@/components/admin/ServicesManager";
+import { InstallersManager } from "@/components/admin/InstallersManager";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -55,6 +56,7 @@ function AdminPage() {
           <TabsTrigger value="agenda">Agenda</TabsTrigger>
           <TabsTrigger value="solicitudes">Solicitudes</TabsTrigger>
           <TabsTrigger value="servicios">Trabajos</TabsTrigger>
+          <TabsTrigger value="instaladores">Instaladores</TabsTrigger>
         </TabsList>
         <TabsContent value="agenda" className="mt-6">
           <AgendaPanel />
@@ -64,6 +66,9 @@ function AdminPage() {
         </TabsContent>
         <TabsContent value="servicios" className="mt-6">
           <ServicesManager />
+        </TabsContent>
+        <TabsContent value="instaladores" className="mt-6">
+          <InstallersManager />
         </TabsContent>
       </Tabs>
     </main>
