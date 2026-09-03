@@ -76,7 +76,7 @@ export const loadInstallersPanel = async (db: Db) => {
 
 type EarliestParams = {
   requestId: string;
-  days?: number;
+  days?: number | undefined;
 };
 
 /**
