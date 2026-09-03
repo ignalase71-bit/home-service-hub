@@ -3,6 +3,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
+  adminAssignRequestInstaller,
+  adminEarliestInstallerSlots,
+  adminInstallersPanel,
   adminProposeSlots,
   adminRequests,
   adminUpdateRequestStatus,
@@ -28,17 +31,46 @@ const formatSlot = (iso: string) =>
     minute: "2-digit",
   }).format(new Date(iso));
 
+type Candidate = {
+  installerId: string;
+  name: string;
+  color: string;
+  qualified: boolean;
+  reason: string | null;
+  slot: { date: string; startTime: string; endTime: string; iso: string } | null;
+};
+
+/** ISO → valor válido para <input type="datetime-local"> en hora local. */
+const toLocalInput = (iso: string) => {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+
 export function RequestsManager() {
   const queryClient = useQueryClient();
   const listFn = useServerFn(adminRequests);
   const proposeFn = useServerFn(adminProposeSlots);
   const statusFn = useServerFn(adminUpdateRequestStatus);
+  const assignFn = useServerFn(adminAssignRequestInstaller);
+  const searchFn = useServerFn(adminEarliestInstallerSlots);
+  const installersFn = useServerFn(adminInstallersPanel);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-requests"],
     queryFn: () => listFn({}),
   });
   const requests = (data ?? []) as AdminRequest[];
+
+  const { data: panel } = useQuery({
+    queryKey: ["admin-installers"],
+    queryFn: () => installersFn({}),
+  });
+  const installers = (panel?.installers ?? []) as { id: string; name: string; color: string }[];
+  const installerById = new Map(installers.map((i) => [i.id, i]));
+
+  const [searchId, setSearchId] = useState<string | null>(null);
+  const [candidates, setCandidates] = useState<Candidate[] | null>(null);
 
   const [openId, setOpenId] = useState<string | null>(null);
   const [slots, setSlots] = useState<string[]>(["", "", ""]);
@@ -68,6 +100,33 @@ export function RequestsManager() {
     },
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "No se pudieron proponer las fechas"),
+  });
+
+  const search = useMutation({
+    mutationFn: (requestId: string) => searchFn({ data: { requestId } }),
+    onSuccess: (result) => {
+      setCandidates(result.candidates as Candidate[]);
+      if (!result.recommendedInstallerId) {
+        toast.warning(
+          result.express
+            ? "Ningún instalador tiene hueco dentro de las próximas 24 h."
+            : "Ningún instalador compatible tiene hueco en las próximas semanas.",
+        );
+      }
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "No se pudo buscar disponibilidad"),
+  });
+
+  const assign = useMutation({
+    mutationFn: (values: { requestId: string; installerId: string | null }) =>
+      assignFn({ data: values }),
+    onSuccess: () => {
+      toast.success("Instalador asignado a la solicitud");
+      void invalidate();
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "No se pudo asignar el instalador"),
   });
 
   const setStatus = useMutation({
@@ -152,6 +211,93 @@ export function RequestsManager() {
               ) : (
                 <p className="text-muted-foreground">Sin fechas propuestas todavía.</p>
               )}
+            </div>
+
+            <div className="mt-3 rounded-md border border-border/70 bg-surface p-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wide">Instalador</span>
+                <select
+                  aria-label="Instalador asignado"
+                  className="rounded-md border border-border bg-background px-2 py-1 text-sm"
+                  value={request.installer_id ?? ""}
+                  onChange={(e) =>
+                    assign.mutate({
+                      requestId: request.id,
+                      installerId: e.target.value || null,
+                    })
+                  }
+                >
+                  <option value="">Sin asignar</option>
+                  {installers.map((installer) => (
+                    <option key={installer.id} value={installer.id}>
+                      {installer.name}
+                    </option>
+                  ))}
+                </select>
+                {request.installer_id ? (
+                  <Badge
+                    variant="outline"
+                    style={{ borderColor: installerById.get(request.installer_id)?.color }}
+                  >
+                    {installerById.get(request.installer_id)?.name ?? "Asignado"}
+                  </Badge>
+                ) : null}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSearchId(request.id);
+                    setCandidates(null);
+                    search.mutate(request.id);
+                  }}
+                  disabled={search.isPending && searchId === request.id}
+                >
+                  {search.isPending && searchId === request.id
+                    ? "Buscando…"
+                    : "Buscar hueco más cercano"}
+                </Button>
+              </div>
+
+              {searchId === request.id && candidates ? (
+                <ul className="mt-3 space-y-1 text-sm">
+                  {candidates.map((candidate, index) => (
+                    <li
+                      key={candidate.installerId}
+                      className="flex flex-wrap items-center gap-2 rounded-md bg-card px-2 py-1"
+                    >
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: candidate.color }}
+                      />
+                      <span className="font-semibold">{candidate.name}</span>
+                      {candidate.slot ? (
+                        <>
+                          <span className="capitalize text-muted-foreground">
+                            {formatSlot(candidate.slot.iso)}
+                          </span>
+                          {index === 0 ? <Badge variant="secondary">Más cercano</Badge> : null}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              assign.mutate({
+                                requestId: request.id,
+                                installerId: candidate.installerId,
+                              });
+                              setOpenId(request.id);
+                              setSlots([toLocalInput(candidate.slot!.iso), "", ""]);
+                            }}
+                          >
+                            Asignar y proponer
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">{candidate.reason}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">

@@ -161,6 +161,7 @@ export type AdminRequestItem = {
 
 export type AdminRequest = {
   id: string;
+  installer_id: string | null;
   request_number: number;
   public_token: string;
   status: string;
