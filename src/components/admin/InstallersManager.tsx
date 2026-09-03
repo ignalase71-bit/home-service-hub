@@ -358,7 +358,7 @@ export function InstallersManager() {
             <section key={installer.id} className="rounded-lg border border-border p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="flex items-center gap-2 font-display text-lg">
+                  <div className="flex items-center gap-2 font-display text-lg">
                     <span
                       className="h-3 w-3 rounded-full"
                       style={{ backgroundColor: installer.color }}
@@ -366,7 +366,7 @@ export function InstallersManager() {
                     {installer.name}
                     {!installer.active ? <Badge variant="outline">Inactivo</Badge> : null}
                     {installer.express_enabled ? <Badge variant="secondary">🚀 Express</Badge> : null}
-                  </p>
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     {installer.specialties.join(" · ") || "Sin especialidades"} ·{" "}
                     {installer.zones.join(", ") || "Todas las zonas"}
