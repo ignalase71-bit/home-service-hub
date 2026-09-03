@@ -160,14 +160,14 @@ export function RequestsManager() {
           <section key={request.id} className="rounded-lg border border-border p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="font-display text-lg">
+                <div className="font-display text-lg">
                   Solicitud #{request.request_number} · {request.customer?.name ?? "Cliente"}
                   {request.express ? (
                     <Badge className="ml-2" variant="secondary">
                       🚀 Express 24 h
                     </Badge>
                   ) : null}
-                </p>
+                </div>
                 <p className="text-sm text-muted-foreground">
                   {request.customer?.phone ?? ""} · {request.customer?.address ?? ""} (
                   {request.distance_km} km)
