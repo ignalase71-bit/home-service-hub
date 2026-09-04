@@ -91,7 +91,7 @@ function Landing() {
               Tu casa, instalada y montada como debe ser.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-primary-foreground/80">
-              Elige el servicio, ve el precio final antes de confirmar y reserva la hora exacta.
+              Elige el servicio, obtén el precio final antes de confirmar y reserva la hora exacta.
               Nosotros llegamos puntuales, dejamos todo funcionando y recogemos al salir.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
