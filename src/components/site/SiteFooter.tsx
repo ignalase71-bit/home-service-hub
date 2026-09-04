@@ -59,7 +59,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} Instalia · Jerez de la Frontera</span>
+          <span>© {new Date().getFullYear()} TeLoMontamos.com · Jerez de la Frontera</span>
           <span>Técnicos verificados · Trabajo garantizado · Precio sin sorpresas</span>
         </div>
       </div>
