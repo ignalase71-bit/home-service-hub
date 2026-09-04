@@ -13,13 +13,13 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/solicitud/$token")({
   head: () => ({
     meta: [
-      { title: "Tu solicitud de montaje | Instalia Jerez" },
+      { title: "Tu solicitud de montaje | TeLoMontamos.com" },
       {
         name: "description",
         content:
           "Consulta tu presupuesto de montaje y elige una de las tres fechas propuestas por nuestro equipo.",
       },
-      { property: "og:title", content: "Tu solicitud de montaje | Instalia Jerez" },
+      { property: "og:title", content: "Tu solicitud de montaje | TeLoMontamos.com" },
       {
         property: "og:description",
         content: "Presupuesto detallado y elección de fecha de montaje.",

@@ -1,17 +1,27 @@
 import { Link } from "@tanstack/react-router";
 
+import logo from "@/assets/logo-telomontamos.png.asset.json";
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-6xl px-6 py-14">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
-            <p className="font-display text-xl font-semibold">Instalia</p>
+            <img
+              src={logo.url}
+              alt="TeLoMontamos.com"
+              width={640}
+              height={128}
+              loading="lazy"
+              className="h-9 w-auto"
+            />
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
               Instalación y montaje a domicilio con precio cerrado, técnicos verificados y cita
               confirmada. Jerez de la Frontera y alrededores.
             </p>
           </div>
+
           <div>
             <p className="text-eyebrow">Servicios</p>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
@@ -49,7 +59,7 @@ export function SiteFooter() {
           </div>
         </div>
         <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <span>© {new Date().getFullYear()} Instalia · Jerez de la Frontera</span>
+          <span>© {new Date().getFullYear()} TeLoMontamos.com · Jerez de la Frontera</span>
           <span>Técnicos verificados · Trabajo garantizado · Precio sin sorpresas</span>
         </div>
       </div>

@@ -29,13 +29,13 @@ const categoryArt: Record<string, string> = {
 export const Route = createFileRoute("/servicios")({
   head: () => ({
     meta: [
-      { title: "Servicios de instalación y montaje en Jerez | Instalia" },
+      { title: "Servicios de instalación y montaje en Jerez | TeLoMontamos.com" },
       {
         name: "description",
         content:
           "Climatización, fontanería, electricidad y montaje de muebles a domicilio en Jerez. Precio por servicio, duración estimada y opción Express.",
       },
-      { property: "og:title", content: "Servicios de instalación y montaje | Instalia" },
+      { property: "og:title", content: "Servicios de instalación y montaje | TeLoMontamos.com" },
       {
         property: "og:description",
         content:

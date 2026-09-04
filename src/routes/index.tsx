@@ -42,13 +42,13 @@ const fallbackArt = [catCocina, catEnergia];
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Instalia | Instalación y montaje a domicilio en Jerez" },
+      { title: "TeLoMontamos.com | Instalación y montaje a domicilio en Jerez" },
       {
         name: "description",
         content:
           "Servicio premium de instalación y montaje a domicilio en Jerez: precio cerrado, técnicos verificados, cita confirmada y opción Express en 24 h.",
       },
-      { property: "og:title", content: "Instalia | Instalación premium a domicilio" },
+      { property: "og:title", content: "TeLoMontamos.com | Instalación premium a domicilio" },
       {
         property: "og:description",
         content:

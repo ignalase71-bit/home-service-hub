@@ -11,12 +11,12 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Nueva contraseña | Instalia Jerez" },
+      { title: "Nueva contraseña | TeLoMontamos.com" },
       {
         name: "description",
-        content: "Define una contraseña nueva para acceder al panel de gestión de Instalia Jerez.",
+        content: "Define una contraseña nueva para acceder al panel de gestión de TeLoMontamos.com.",
       },
-      { property: "og:title", content: "Nueva contraseña | Instalia Jerez" },
+      { property: "og:title", content: "Nueva contraseña | TeLoMontamos.com" },
       {
         property: "og:description",
         content: "Restablece el acceso al panel interno de gestión.",

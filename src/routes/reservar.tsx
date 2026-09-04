@@ -19,13 +19,13 @@ const catalogQuery = queryOptions({ queryKey: ["catalog"], queryFn: () => getCat
 export const Route = createFileRoute("/reservar")({
   head: () => ({
     meta: [
-      { title: "Solicitar montaje en Jerez | Instalia Jerez" },
+      { title: "Solicitar montaje en Jerez | TeLoMontamos.com" },
       {
         name: "description",
         content:
           "Elige tus trabajos y cantidades, acepta el presupuesto y te proponemos tres fechas de montaje para que elijas la que mejor te venga.",
       },
-      { property: "og:title", content: "Solicitar montaje | Instalia Jerez" },
+      { property: "og:title", content: "Solicitar montaje | TeLoMontamos.com" },
       {
         property: "og:description",
         content: "Presupuesto transparente, tres fechas a elegir y opción Express en 24 h.",

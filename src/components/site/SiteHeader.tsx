@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import logo from "@/assets/logo-telomontamos.png.asset.json";
 
 const links = [
   { to: "/servicios", label: "Servicios" },
@@ -16,12 +17,16 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link to="/" className="flex items-baseline gap-2">
-          <span className="font-display text-lg font-semibold tracking-tight">Instalia</span>
-          <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
-            Jerez
-          </span>
+        <Link to="/" className="flex items-center" aria-label="TeLoMontamos.com — inicio">
+          <img
+            src={logo.url}
+            alt="TeLoMontamos.com"
+            width={640}
+            height={128}
+            className="h-8 w-auto md:h-9"
+          />
         </Link>
+
 
         <nav className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
