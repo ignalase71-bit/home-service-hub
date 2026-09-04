@@ -42,11 +42,11 @@ const fallbackArt = [catCocina, catEnergia];
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TeLoMontamos.com | Instalación y montaje a domicilio en Jerez" },
+      { title: "TeLoMontamos.com | Instalación y montaje a domicilio en Jerez y alrededores" },
       {
         name: "description",
         content:
-          "Servicio premium de instalación y montaje a domicilio en Jerez: precio cerrado, técnicos verificados, cita confirmada y opción Express en 24 h.",
+          "Servicio premium de instalación y montaje a domicilio en Jerez y alrededores: precio cerrado, técnicos verificados, cita confirmada y opción Express en 24 h.",
       },
       { property: "og:title", content: "TeLoMontamos.com | Instalación premium a domicilio" },
       {
@@ -85,7 +85,7 @@ function Landing() {
           <div className="hero-scrim absolute inset-0" />
           <div className="relative mx-auto max-w-6xl px-6 py-28 md:py-40">
             <p className="text-eyebrow text-primary-foreground/70">
-              Jerez de la Frontera · Servicio premium
+              Jerez y alrededores · Servicio premium
             </p>
             <h1 className="text-display mt-5 max-w-3xl text-4xl text-primary-foreground sm:text-5xl md:text-6xl">
               Tu casa, instalada y montada como debe ser.
