@@ -116,13 +116,24 @@ function AuthPage() {
               {mode === "login" ? "Entrar" : "Crear cuenta"}
             </Button>
           </form>
-          <button
-            type="button"
-            className="text-sm text-muted-foreground underline"
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          >
-            {mode === "login" ? "Crear una cuenta nueva" : "Ya tengo cuenta"}
-          </button>
+          <div className="flex flex-col items-start gap-2">
+            <button
+              type="button"
+              className="text-sm text-muted-foreground underline"
+              onClick={() => setMode(mode === "login" ? "signup" : "login")}
+            >
+              {mode === "login" ? "Crear una cuenta nueva" : "Ya tengo cuenta"}
+            </button>
+            <button
+              type="button"
+              className="text-sm text-muted-foreground underline"
+              onClick={sendReset}
+              disabled={busy}
+            >
+              He olvidado mi contraseña
+            </button>
+          </div>
+
           <p className="text-xs text-muted-foreground">
             <Link to="/" className="underline">
               Volver a la web pública
