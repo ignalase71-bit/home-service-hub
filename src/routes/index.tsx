@@ -236,7 +236,7 @@ function Landing() {
                 Sin presupuestos eternos ni sorpresas al final
               </h2>
               <p className="mt-5 text-muted-foreground">
-                Antes de confirmar ves el desglose completo: mano de obra, extras, desplazamiento y
+                Antes de confirmar verás el desglose completo: mano de obra, extras, desplazamiento y
                 recargo Express si lo eliges. Un solo desplazamiento por visita, aunque agrupes
                 varios trabajos.
               </p>
