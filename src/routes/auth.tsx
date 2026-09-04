@@ -59,6 +59,26 @@ function AuthPage() {
     }
   };
 
+  const sendReset = async () => {
+    if (!email) {
+      toast.error("Escribe primero tu correo electrónico");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Te enviamos un correo para restablecer la contraseña");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo enviar el correo");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface px-4 py-16">
       <Card className="w-full max-w-md panel">
