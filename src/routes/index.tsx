@@ -52,7 +52,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Elige el servicio, ves el precio final y reservas la hora. Sin presupuestos eternos ni sorpresas.",
+          "Eliges el servicio, ves el precio final y reservas la hora. Sin presupuestos eternos ni sorpresas.",
       },
     ],
   }),
