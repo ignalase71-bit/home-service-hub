@@ -10,13 +10,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Acceso profesional | Instalia Jerez" },
+      { title: "Acceso profesional | TeLoMontamos.com" },
       {
         name: "description",
         content:
-          "Acceso al panel interno de gestión de visitas, instaladores y agenda de Instalia Jerez.",
+          "Acceso al panel interno de gestión de visitas, instaladores y agenda de TeLoMontamos.com.",
       },
-      { property: "og:title", content: "Acceso profesional | Instalia Jerez" },
+      { property: "og:title", content: "Acceso profesional | TeLoMontamos.com" },
       {
         property: "og:description",
         content: "Panel interno de gestión de visitas e instaladores.",

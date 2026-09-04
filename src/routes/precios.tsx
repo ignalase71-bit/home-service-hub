@@ -16,13 +16,13 @@ const catalogQuery = queryOptions({
 export const Route = createFileRoute("/precios")({
   head: () => ({
     meta: [
-      { title: "Precios transparentes y zonas de servicio | Instalia Jerez" },
+      { title: "Precios transparentes y zonas de servicio | TeLoMontamos.com" },
       {
         name: "description",
         content:
           "Cómo calculamos el precio: mano de obra cerrada, desplazamiento según zona y recargo Express opcional. Todo visible antes de confirmar la cita.",
       },
-      { property: "og:title", content: "Precios transparentes | Instalia Jerez" },
+      { property: "og:title", content: "Precios transparentes | TeLoMontamos.com" },
       {
         property: "og:description",
         content:

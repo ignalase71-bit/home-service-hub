@@ -19,13 +19,13 @@ const catalogQuery = queryOptions({
 export const Route = createFileRoute("/ikea")({
   head: () => ({
     meta: [
-      { title: "Montaje de muebles IKEA a domicilio en Jerez | Instalia" },
+      { title: "Montaje de muebles IKEA a domicilio en Jerez | TeLoMontamos.com" },
       {
         name: "description",
         content:
           "Montaje profesional de muebles IKEA y similares en Jerez: precio por mueble, anclaje seguro a pared y retirada de embalajes.",
       },
-      { property: "og:title", content: "Montaje de muebles IKEA en Jerez | Instalia" },
+      { property: "og:title", content: "Montaje de muebles IKEA en Jerez | TeLoMontamos.com" },
       {
         property: "og:description",
         content:
