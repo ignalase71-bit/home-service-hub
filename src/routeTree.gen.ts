@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IkeaRouteImport } from './routes/ikea'
 import { Route as PreciosRouteImport } from './routes/precios'
 import { Route as ReservarRouteImport } from './routes/reservar'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ServiciosRouteImport } from './routes/servicios'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as SolicitudTokenRouteImport } from './routes/solicitud.$token'
@@ -48,6 +49,11 @@ const ReservarRoute = ReservarRouteImport.update({
   path: '/reservar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServiciosRoute = ServiciosRouteImport.update({
   id: '/servicios',
   path: '/servicios',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/ikea': typeof IkeaRoute
   '/precios': typeof PreciosRoute
   '/reservar': typeof ReservarRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/servicios': typeof ServiciosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/solicitud/$token': typeof SolicitudTokenRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/ikea': typeof IkeaRoute
   '/precios': typeof PreciosRoute
   '/reservar': typeof ReservarRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/servicios': typeof ServiciosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/solicitud/$token': typeof SolicitudTokenRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/ikea': typeof IkeaRoute
   '/precios': typeof PreciosRoute
   '/reservar': typeof ReservarRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/servicios': typeof ServiciosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/solicitud/$token': typeof SolicitudTokenRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/ikea'
     | '/precios'
     | '/reservar'
+    | '/reset-password'
     | '/servicios'
     | '/admin'
     | '/solicitud/$token'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/ikea'
     | '/precios'
     | '/reservar'
+    | '/reset-password'
     | '/servicios'
     | '/admin'
     | '/solicitud/$token'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/ikea'
     | '/precios'
     | '/reservar'
+    | '/reset-password'
     | '/servicios'
     | '/_authenticated/admin'
     | '/solicitud/$token'
@@ -137,6 +149,7 @@ export interface RootRouteChildren {
   IkeaRoute: typeof IkeaRoute
   PreciosRoute: typeof PreciosRoute
   ReservarRoute: typeof ReservarRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ServiciosRoute: typeof ServiciosRoute
   SolicitudTokenRoute: typeof SolicitudTokenRoute
 }
@@ -185,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReservarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/servicios': {
       id: '/servicios'
       path: '/servicios'
@@ -227,6 +247,7 @@ const rootRouteChildren: RootRouteChildren = {
   IkeaRoute: IkeaRoute,
   PreciosRoute: PreciosRoute,
   ReservarRoute: ReservarRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ServiciosRoute: ServiciosRoute,
   SolicitudTokenRoute: SolicitudTokenRoute,
 }
