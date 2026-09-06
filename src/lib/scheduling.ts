@@ -357,3 +357,54 @@ export const installerAvailabilityState = (params: {
   );
   return nearby ? "nearby" : "available";
 };
+
+/* ---------------------------------------------------------------------- */
+/* Profesionales/equipos necesarios para un pedido                         */
+/* ---------------------------------------------------------------------- */
+
+export type ProfessionalCapability = {
+  id: string;
+  /** Tipos de trabajo (service ids) que puede realizar. */
+  serviceIds: string[];
+};
+
+/**
+ * Devuelve el número mínimo (heurística codiciosa exacta en la práctica) de
+ * profesionales/equipos distintos necesarios para cubrir los tipos de trabajo
+ * solicitados. Las cantidades no influyen: 5 muebles del mismo tipo siguen
+ * siendo 1 profesional.
+ *
+ * Fallback seguro: los tipos de trabajo sin profesional asignado se agrupan
+ * en un único "equipo pendiente de asignar" para no romper presupuestos
+ * antiguos ni catálogos sin configurar.
+ */
+export const computeRequiredProfessionals = (
+  serviceIds: string[],
+  professionals: ProfessionalCapability[],
+): { count: number; professionalIds: string[]; unassignedServiceIds: string[] } => {
+  const needed = [...new Set(serviceIds)];
+  const covered = new Set<string>();
+  const chosen: string[] = [];
+
+  const canCover = (p: ProfessionalCapability) =>
+    needed.filter((s) => p.serviceIds.includes(s) && !covered.has(s));
+
+  // Greedy set cover: en cada paso el profesional que cubre más trabajos.
+  for (;;) {
+    let best: { p: ProfessionalCapability; gain: string[] } | null = null;
+    for (const p of professionals) {
+      if (chosen.includes(p.id)) continue;
+      const gain = canCover(p);
+      if (gain.length === 0) continue;
+      if (!best || gain.length > best.gain.length) best = { p, gain };
+    }
+    if (!best) break;
+    chosen.push(best.p.id);
+    for (const s of best.gain) covered.add(s);
+  }
+
+  const unassignedServiceIds = needed.filter((s) => !covered.has(s));
+  // Un solo equipo extra para todo lo que no tenga profesional configurado.
+  const count = chosen.length + (unassignedServiceIds.length > 0 ? 1 : 0);
+  return { count, professionalIds: chosen, unassignedServiceIds };
+};
