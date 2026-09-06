@@ -1,8 +1,10 @@
 import { internalDb } from "./booking.server";
 import {
+  computeRequiredProfessionals,
   computeVisitDuration,
   computeVisitTotals,
   round2,
+  type ProfessionalCapability,
   type VisitTotals,
 } from "./scheduling";
 import { getPricingRules, zoneFeeForDistance } from "./visits.server";
@@ -29,7 +31,48 @@ export type Quote = {
   distanceFee: number;
   express: boolean;
   expressAvailable: boolean;
+  /** Nº de profesionales/equipos distintos necesarios (uso interno/admin). */
+  professionalsRequired: number;
 };
+
+/**
+ * Capacidades de los profesionales activos: qué tipos de trabajo puede hacer
+ * cada uno. Fuente principal: tabla installer_services. Fallback seguro:
+ * la especialidad del servicio frente a las especialidades del instalador.
+ */
+export const loadProfessionalCapabilities = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  options: { expressOnly?: boolean } = {},
+): Promise<ProfessionalCapability[]> => {
+  const [installersRes, linksRes, servicesRes] = await Promise.all([
+    db.from("installers").select("id, specialties, active, express_enabled").eq("active", true),
+    db.from("installer_services").select("installer_id, service_id"),
+    db.from("services").select("id, specialty"),
+  ]);
+  const installers = (installersRes.data ?? []) as {
+    id: string;
+    specialties: string[] | null;
+    express_enabled: boolean;
+  }[];
+  const links = (linksRes.data ?? []) as { installer_id: string; service_id: string }[];
+  const services = (servicesRes.data ?? []) as { id: string; specialty: string | null }[];
+
+  return installers
+    .filter((i) => (options.expressOnly ? i.express_enabled : true))
+    .map((i) => {
+      const explicit = links.filter((l) => l.installer_id === i.id).map((l) => l.service_id);
+      if (explicit.length > 0) return { id: i.id, serviceIds: explicit };
+      const specialties = i.specialties ?? [];
+      return {
+        id: i.id,
+        serviceIds: services
+          .filter((s) => s.specialty && specialties.includes(s.specialty))
+          .map((s) => s.id),
+      };
+    });
+};
+
 
 /**
  * Presupuesto con cantidades. Reutiliza exactamente las reglas de precio
@@ -56,7 +99,6 @@ export const computeQuote = async (input: {
     const quantity = Math.max(1, Math.round(item.quantity));
     const unitPrice = Number(service.base_price);
     const express = input.express && Boolean(service.express_available);
-    const expressFee = express && rules.expressPerService ? Number(service.express_fee) : 0;
     return {
       serviceId: service.id as string,
       name: service.name as string,
@@ -64,20 +106,36 @@ export const computeQuote = async (input: {
       quantity,
       unitPrice,
       express,
-      expressFee,
+      // El Express ya no se cobra por trabajo: es una única línea del total.
+      expressFee: 0,
       durationMinutes: service.duration_minutes as number,
       subtotal: round2(unitPrice * quantity),
     };
   });
+
+  const expressAvailable = services.some((s) => s.express_available);
+  const expressActive = input.express && expressAvailable;
+
+  // Express = profesionales/equipos distintos necesarios × tarifa Express.
+  const professionals = await loadProfessionalCapabilities(db, {
+    expressOnly: expressActive,
+  });
+  const required = computeRequiredProfessionals(
+    [...new Set(ids)],
+    professionals,
+  );
+  const professionalsRequired = Math.max(expressActive ? 1 : 0, required.count);
+  const expressTotal = expressActive
+    ? round2(professionalsRequired * Number(rules.expressFee))
+    : 0;
 
   const totals = computeVisitTotals(
     lines.map((l) => ({
       base_price: l.unitPrice,
       quantity: l.quantity,
       express: l.express,
-      express_fee: l.expressFee || Number(rules.expressFee),
     })),
-    { distanceFee: zone.fee, rules },
+    { distanceFee: zone.fee, rules, expressOverride: expressTotal },
   );
 
   const durationMinutes = computeVisitDuration(
@@ -98,8 +156,10 @@ export const computeQuote = async (input: {
     zoneName: zone.zoneName,
     distanceFee: zone.fee,
     express: input.express,
-    expressAvailable: services.some((s) => s.express_available),
+    expressAvailable,
+    professionalsRequired: expressActive ? professionalsRequired : required.count,
   };
+
 };
 
 export type CustomerInput = {
@@ -151,6 +211,8 @@ export const createQuoteRequest = async (input: {
       distance_fee: quote.distanceFee,
       services_total: quote.totals.servicesTotal,
       express_total: quote.totals.expressTotal,
+      express_professionals: quote.totals.expressTotal > 0 ? quote.professionalsRequired : 0,
+
       total: quote.totals.total,
       duration_minutes: quote.durationMinutes,
       notes: input.customer.notes || null,

@@ -622,3 +622,20 @@ export const adminDeleteInstaller = createServerFn({ method: "POST" })
     await assertAdmin(context.supabase, context.userId);
     return deleteInstaller(context.supabase, data.id);
   });
+
+export const adminSetInstallerServices = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        installerId: z.string().uuid(),
+        serviceIds: z.array(z.string().uuid()),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { assertAdmin } = await import("./admin.server");
+    const { setInstallerServices } = await import("./admin-installers.server");
+    await assertAdmin(context.supabase, context.userId);
+    return setInstallerServices(context.supabase, data);
+  });

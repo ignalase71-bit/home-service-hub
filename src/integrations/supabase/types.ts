@@ -177,6 +177,39 @@ export type Database = {
           },
         ]
       }
+      installer_services: {
+        Row: {
+          created_at: string
+          installer_id: string
+          service_id: string
+        }
+        Insert: {
+          created_at?: string
+          installer_id: string
+          service_id: string
+        }
+        Update: {
+          created_at?: string
+          installer_id?: string
+          service_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installer_services_installer_id_fkey"
+            columns: ["installer_id"]
+            isOneToOne: false
+            referencedRelation: "installers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "installer_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       installers: {
         Row: {
           active: boolean
@@ -299,6 +332,7 @@ export type Database = {
           distance_km: number
           duration_minutes: number
           express: boolean
+          express_professionals: number
           express_total: number
           id: string
           installer_id: string | null
@@ -325,6 +359,7 @@ export type Database = {
           distance_km?: number
           duration_minutes?: number
           express?: boolean
+          express_professionals?: number
           express_total?: number
           id?: string
           installer_id?: string | null
@@ -351,6 +386,7 @@ export type Database = {
           distance_km?: number
           duration_minutes?: number
           express?: boolean
+          express_professionals?: number
           express_total?: number
           id?: string
           installer_id?: string | null
