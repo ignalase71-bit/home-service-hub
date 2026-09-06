@@ -242,19 +242,21 @@ function BookingPage() {
                 </div>
                 <div className="space-y-2">
                   <Label>Servicio Express (24 h)</Label>
-                  <div className="flex items-center gap-3 rounded-md border border-border p-3">
+                  <div className="flex items-start gap-3 rounded-md border border-border p-3">
                     <Switch
                       checked={express}
                       disabled={!expressPossible}
                       onCheckedChange={setExpress}
+                      className="mt-0.5 shrink-0"
                     />
-                    <span className="text-sm">
+                    <span className="text-sm text-muted-foreground">
                       {expressPossible
-                        ? "Montaje dentro de las próximas 24 h"
+                        ? "Priorizamos tu servicio para realizarlo en las próximas 24 horas, sujeto a disponibilidad."
                         : "No disponible para estos trabajos"}
                     </span>
                   </div>
                 </div>
+
               </div>
               {quote.data ? (
                 <p className="mt-4 text-sm text-muted-foreground">
