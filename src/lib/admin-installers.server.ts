@@ -41,8 +41,10 @@ export const loadInstallersPanel = async (db: Db) => {
       .from("requests")
       .select("id, installer_id, status")
       .not("installer_id", "is", null),
-    db.from("services").select("specialty").eq("active", true),
+    db.from("services").select("id, name, specialty").eq("active", true).order("name"),
   ]);
+
+  const links = await db.from("installer_services").select("installer_id, service_id");
 
   const specialties = [
     ...new Set((services.data ?? []).map((s) => s.specialty as string).filter(Boolean)),
@@ -56,6 +58,8 @@ export const loadInstallersPanel = async (db: Db) => {
     schedules: (schedules.data ?? []) as WeeklySchedule[],
     blocks: blocks.data ?? [],
     specialties,
+    services: (services.data ?? []) as { id: string; name: string; specialty: string | null }[],
+    installerServices: (links.data ?? []) as { installer_id: string; service_id: string }[],
     workload: (installers.data ?? []).map((i) => {
       const id = i["id"] as string;
       const own = visitRows.filter((v) => v.installer_id === id && v.status !== "cancelled");
@@ -228,6 +232,27 @@ export const assignRequestInstaller = async (
     .eq("id", params.requestId);
   if (error) throw new Error(error.message);
   return { ok: true as const };
+};
+
+/** Tipos de trabajo que puede realizar un profesional (relación N:N). */
+export const setInstallerServices = async (
+  db: Db,
+  params: { installerId: string; serviceIds: string[] },
+) => {
+  const { error: delError } = await db
+    .from("installer_services")
+    .delete()
+    .eq("installer_id", params.installerId);
+  if (delError) throw new Error("No se pudieron actualizar los trabajos del profesional");
+  const rows = [...new Set(params.serviceIds)].map((service_id) => ({
+    installer_id: params.installerId,
+    service_id,
+  }));
+  if (rows.length > 0) {
+    const { error } = await db.from("installer_services").insert(rows);
+    if (error) throw new Error("No se pudieron guardar los trabajos del profesional");
+  }
+  return { ok: true as const, count: rows.length };
 };
 
 export const deleteInstaller = async (db: Db, id: string) => {
