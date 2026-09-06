@@ -1,8 +1,10 @@
 import { internalDb } from "./booking.server";
 import {
+  computeRequiredProfessionals,
   computeVisitDuration,
   computeVisitTotals,
   round2,
+  type ProfessionalCapability,
   type VisitTotals,
 } from "./scheduling";
 import { getPricingRules, zoneFeeForDistance } from "./visits.server";
@@ -29,7 +31,48 @@ export type Quote = {
   distanceFee: number;
   express: boolean;
   expressAvailable: boolean;
+  /** Nº de profesionales/equipos distintos necesarios (uso interno/admin). */
+  professionalsRequired: number;
 };
+
+/**
+ * Capacidades de los profesionales activos: qué tipos de trabajo puede hacer
+ * cada uno. Fuente principal: tabla installer_services. Fallback seguro:
+ * la especialidad del servicio frente a las especialidades del instalador.
+ */
+export const loadProfessionalCapabilities = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  options: { expressOnly?: boolean } = {},
+): Promise<ProfessionalCapability[]> => {
+  const [installersRes, linksRes, servicesRes] = await Promise.all([
+    db.from("installers").select("id, specialties, active, express_enabled").eq("active", true),
+    db.from("installer_services").select("installer_id, service_id"),
+    db.from("services").select("id, specialty"),
+  ]);
+  const installers = (installersRes.data ?? []) as {
+    id: string;
+    specialties: string[] | null;
+    express_enabled: boolean;
+  }[];
+  const links = (linksRes.data ?? []) as { installer_id: string; service_id: string }[];
+  const services = (servicesRes.data ?? []) as { id: string; specialty: string | null }[];
+
+  return installers
+    .filter((i) => (options.expressOnly ? i.express_enabled : true))
+    .map((i) => {
+      const explicit = links.filter((l) => l.installer_id === i.id).map((l) => l.service_id);
+      if (explicit.length > 0) return { id: i.id, serviceIds: explicit };
+      const specialties = i.specialties ?? [];
+      return {
+        id: i.id,
+        serviceIds: services
+          .filter((s) => s.specialty && specialties.includes(s.specialty))
+          .map((s) => s.id),
+      };
+    });
+};
+
 
 /**
  * Presupuesto con cantidades. Reutiliza exactamente las reglas de precio
