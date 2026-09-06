@@ -118,7 +118,12 @@ export type VisitTotals = {
 /** Totales de una visita: servicios + Express + UN solo desplazamiento. */
 export const computeVisitTotals = (
   items: PricedItem[],
-  options: { distanceFee: number; rules?: PricingRules },
+  options: {
+    distanceFee: number;
+    rules?: PricingRules;
+    /** Importe Express ya calculado (única línea del presupuesto). */
+    expressOverride?: number | undefined;
+  },
 ): VisitTotals => {
   const rules = options.rules ?? defaultPricingRules;
   const servicesTotal = items.reduce(
@@ -126,11 +131,15 @@ export const computeVisitTotals = (
     0,
   );
   const expressItems = items.filter((i) => i.express);
-  const expressTotal = rules.expressPerService
-    ? expressItems.reduce((sum, i) => sum + (i.express_fee ?? rules.expressFee), 0)
-    : expressItems.length > 0
-      ? (expressItems[0]?.express_fee ?? rules.expressFee)
-      : 0;
+  const expressTotal =
+    options.expressOverride !== undefined
+      ? options.expressOverride
+      : rules.expressPerService
+        ? expressItems.reduce((sum, i) => sum + (i.express_fee ?? rules.expressFee), 0)
+        : expressItems.length > 0
+          ? (expressItems[0]?.express_fee ?? rules.expressFee)
+          : 0;
+
   const distanceFee = options.distanceFee;
   return {
     servicesTotal: round2(servicesTotal),
