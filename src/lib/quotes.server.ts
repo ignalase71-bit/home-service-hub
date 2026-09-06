@@ -99,7 +99,6 @@ export const computeQuote = async (input: {
     const quantity = Math.max(1, Math.round(item.quantity));
     const unitPrice = Number(service.base_price);
     const express = input.express && Boolean(service.express_available);
-    const expressFee = express && rules.expressPerService ? Number(service.express_fee) : 0;
     return {
       serviceId: service.id as string,
       name: service.name as string,
@@ -107,20 +106,36 @@ export const computeQuote = async (input: {
       quantity,
       unitPrice,
       express,
-      expressFee,
+      // El Express ya no se cobra por trabajo: es una única línea del total.
+      expressFee: 0,
       durationMinutes: service.duration_minutes as number,
       subtotal: round2(unitPrice * quantity),
     };
   });
+
+  const expressAvailable = services.some((s) => s.express_available);
+  const expressActive = input.express && expressAvailable;
+
+  // Express = profesionales/equipos distintos necesarios × tarifa Express.
+  const professionals = await loadProfessionalCapabilities(db, {
+    expressOnly: expressActive,
+  });
+  const required = computeRequiredProfessionals(
+    [...new Set(ids)],
+    professionals,
+  );
+  const professionalsRequired = Math.max(expressActive ? 1 : 0, required.count);
+  const expressTotal = expressActive
+    ? round2(professionalsRequired * Number(rules.expressFee))
+    : 0;
 
   const totals = computeVisitTotals(
     lines.map((l) => ({
       base_price: l.unitPrice,
       quantity: l.quantity,
       express: l.express,
-      express_fee: l.expressFee || Number(rules.expressFee),
     })),
-    { distanceFee: zone.fee, rules },
+    { distanceFee: zone.fee, rules, expressOverride: expressTotal },
   );
 
   const durationMinutes = computeVisitDuration(
@@ -141,8 +156,10 @@ export const computeQuote = async (input: {
     zoneName: zone.zoneName,
     distanceFee: zone.fee,
     express: input.express,
-    expressAvailable: services.some((s) => s.express_available),
+    expressAvailable,
+    professionalsRequired: expressActive ? professionalsRequired : required.count,
   };
+
 };
 
 export type CustomerInput = {
