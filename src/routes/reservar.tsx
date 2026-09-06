@@ -332,10 +332,11 @@ function BookingPage() {
                   <span>Trabajos</span>
                   <span>{formatEuro(quote.data?.totals.servicesTotal ?? 0)}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span>Express</span>
+                <div className="flex justify-between gap-2">
+                  <span>Servicio Express (24 h)</span>
                   <span>{formatEuro(quote.data?.totals.expressTotal ?? 0)}</span>
                 </div>
+
                 <div className="flex justify-between">
                   <span>Desplazamiento (1 por visita)</span>
                   <span>{formatEuro(quote.data?.distanceFee ?? zone?.fee ?? 0)}</span>
