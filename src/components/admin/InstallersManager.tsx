@@ -8,6 +8,7 @@ import {
   adminInstallersPanel,
   adminSaveBlock,
   adminSaveInstaller,
+  adminSetInstallerServices,
   adminSaveSchedule,
 } from "@/lib/admin.functions";
 import { WEEKDAYS, type AdminInstaller } from "@/lib/admin-types";
@@ -68,6 +69,7 @@ export function InstallersManager() {
   const blockFn = useServerFn(adminSaveBlock);
   const deleteBlockFn = useServerFn(adminDeleteBlock);
   const deleteFn = useServerFn(adminDeleteInstaller);
+  const setServicesFn = useServerFn(adminSetInstallerServices);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-installers"],
@@ -78,6 +80,15 @@ export function InstallersManager() {
   const schedules = (data?.schedules ?? []) as ScheduleRow[];
   const blocks = (data?.blocks ?? []) as BlockRow[];
   const specialtyOptions = (data?.specialties ?? []) as string[];
+  const serviceOptions = (data?.services ?? []) as {
+    id: string;
+    name: string;
+    specialty: string | null;
+  }[];
+  const serviceLinks = (data?.installerServices ?? []) as {
+    installer_id: string;
+    service_id: string;
+  }[];
   const workload = data?.workload ?? [];
 
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -124,6 +135,17 @@ export function InstallersManager() {
     },
     onError: (error) =>
       toast.error(error instanceof Error ? error.message : "No se pudo guardar el instalador"),
+  });
+
+  const saveServices = useMutation({
+    mutationFn: (params: { installerId: string; serviceIds: string[] }) =>
+      setServicesFn({ data: params }),
+    onSuccess: () => {
+      toast.success("Trabajos del profesional actualizados");
+      invalidate();
+    },
+    onError: (error) =>
+      toast.error(error instanceof Error ? error.message : "No se pudieron guardar los trabajos"),
   });
 
   const saveSchedule = useMutation({
@@ -431,6 +453,48 @@ export function InstallersManager() {
                       )
                       .join(" · ")}
               </p>
+
+              <div className="mt-3 border-t border-border pt-3">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Tipos de trabajo que realiza
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {serviceOptions.length === 0 ? (
+                    <span className="text-xs text-muted-foreground">
+                      Crea tipos de trabajo en la pestaña Trabajos.
+                    </span>
+                  ) : (
+                    serviceOptions.map((service) => {
+                      const current = serviceLinks
+                        .filter((l) => l.installer_id === installer.id)
+                        .map((l) => l.service_id);
+                      const selected = current.includes(service.id);
+                      return (
+                        <button
+                          key={service.id}
+                          type="button"
+                          disabled={saveServices.isPending}
+                          onClick={() =>
+                            saveServices.mutate({
+                              installerId: installer.id,
+                              serviceIds: selected
+                                ? current.filter((id) => id !== service.id)
+                                : [...current, service.id],
+                            })
+                          }
+                          className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                            selected
+                              ? "border-primary bg-primary/10 text-foreground"
+                              : "border-border text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {service.name}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
 
               {openId === installer.id ? (
                 <div className="mt-4 space-y-4 border-t border-border pt-4">
