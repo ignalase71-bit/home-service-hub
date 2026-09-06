@@ -211,6 +211,8 @@ export const createQuoteRequest = async (input: {
       distance_fee: quote.distanceFee,
       services_total: quote.totals.servicesTotal,
       express_total: quote.totals.expressTotal,
+      express_professionals: quote.totals.expressTotal > 0 ? quote.professionalsRequired : 0,
+
       total: quote.totals.total,
       duration_minutes: quote.durationMinutes,
       notes: input.customer.notes || null,
