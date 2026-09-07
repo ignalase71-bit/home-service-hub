@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { queryOptions, useMutation, useQuery, useSuspenseQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -70,13 +70,21 @@ function BookingPage() {
   );
 
   const chosenServices = catalog.services.filter((s) => (quantities[s.id] ?? 0) > 0);
-  const expressPossible = chosenServices.some((s) => s.express_available);
+  const catalogExpress = chosenServices.every((s) => s.express_available) && chosenServices.length > 0;
 
   const quote = useQuery({
     queryKey: ["quote", items, distanceKm, express],
     enabled: items.length > 0,
     queryFn: () => quoteFn({ data: { items, distanceKm, express } }),
   });
+
+  const expressPossible = catalogExpress && (quote.data?.expressAvailable ?? false);
+  const expressReason = quote.data?.expressUnavailableReason ?? null;
+
+  useEffect(() => {
+    if (express && quote.data && !quote.data.expressAvailable) setExpress(false);
+  }, [express, quote.data]);
+
 
   const request = useMutation({
     mutationFn: requestFn,
@@ -244,7 +252,7 @@ function BookingPage() {
                   <Label>Servicio Express (24 h)</Label>
                   <div className="flex items-start gap-3 rounded-md border border-border p-3">
                     <Switch
-                      checked={express}
+                      checked={express && expressPossible}
                       disabled={!expressPossible}
                       onCheckedChange={setExpress}
                       className="mt-0.5 shrink-0"
@@ -252,8 +260,13 @@ function BookingPage() {
                     <span className="text-sm text-muted-foreground">
                       {expressPossible
                         ? "Priorizamos tu servicio para realizarlo en las próximas 24 horas, sujeto a disponibilidad."
-                        : "No disponible para estos trabajos"}
+                        : items.length === 0
+                          ? "Selecciona los trabajos para ver si hay disponibilidad Express."
+                          : quote.isFetching
+                            ? "Comprobando disponibilidad…"
+                            : (expressReason ?? "No disponible para estos trabajos")}
                     </span>
+
                   </div>
                 </div>
 
