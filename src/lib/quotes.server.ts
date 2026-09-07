@@ -40,9 +40,12 @@ export type Quote = {
   distanceFee: number;
   express: boolean;
   expressAvailable: boolean;
+  /** Motivo por el que el Express no se puede contratar (mensaje de servicio). */
+  expressUnavailableReason: string | null;
   /** Nº de profesionales/equipos distintos necesarios (uso interno/admin). */
   professionalsRequired: number;
 };
+
 
 /**
  * Capacidades de los profesionales activos: qué tipos de trabajo puede hacer
