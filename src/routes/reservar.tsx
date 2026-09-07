@@ -70,13 +70,21 @@ function BookingPage() {
   );
 
   const chosenServices = catalog.services.filter((s) => (quantities[s.id] ?? 0) > 0);
-  const expressPossible = chosenServices.some((s) => s.express_available);
+  const catalogExpress = chosenServices.every((s) => s.express_available) && chosenServices.length > 0;
 
   const quote = useQuery({
     queryKey: ["quote", items, distanceKm, express],
     enabled: items.length > 0,
     queryFn: () => quoteFn({ data: { items, distanceKm, express } }),
   });
+
+  const expressPossible = catalogExpress && (quote.data?.expressAvailable ?? false);
+  const expressReason = quote.data?.expressUnavailableReason ?? null;
+
+  useEffect(() => {
+    if (express && quote.data && !quote.data.expressAvailable) setExpress(false);
+  }, [express, quote.data]);
+
 
   const request = useMutation({
     mutationFn: requestFn,
