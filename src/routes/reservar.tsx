@@ -252,7 +252,7 @@ function BookingPage() {
                   <Label>Servicio Express (24 h)</Label>
                   <div className="flex items-start gap-3 rounded-md border border-border p-3">
                     <Switch
-                      checked={express}
+                      checked={express && expressPossible}
                       disabled={!expressPossible}
                       onCheckedChange={setExpress}
                       className="mt-0.5 shrink-0"
@@ -260,8 +260,13 @@ function BookingPage() {
                     <span className="text-sm text-muted-foreground">
                       {expressPossible
                         ? "Priorizamos tu servicio para realizarlo en las próximas 24 horas, sujeto a disponibilidad."
-                        : "No disponible para estos trabajos"}
+                        : items.length === 0
+                          ? "Selecciona los trabajos para ver si hay disponibilidad Express."
+                          : quote.isFetching
+                            ? "Comprobando disponibilidad…"
+                            : (expressReason ?? "No disponible para estos trabajos")}
                     </span>
+
                   </div>
                 </div>
 
