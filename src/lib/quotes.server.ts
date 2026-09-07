@@ -291,7 +291,14 @@ export const createQuoteRequest = async (input: {
   express: boolean;
 }) => {
   const quote = await computeQuote(input);
+  if (input.express && !quote.expressAvailable) {
+    throw new Error(
+      quote.expressUnavailableReason ??
+        "El servicio Express no está disponible ahora mismo para estos trabajos",
+    );
+  }
   const db = internalDb();
+
 
   const { data: customer, error: customerError } = await db
     .from("customers")
