@@ -1,13 +1,22 @@
 import { internalDb } from "./booking.server";
 import {
+  addDays,
   computeRequiredProfessionals,
   computeVisitDuration,
   computeVisitTotals,
+  generateSlotsForDate,
   round2,
+  toMinutes,
+  toTime,
+  type Block,
+  type InstallerLite,
   type ProfessionalCapability,
+  type ScheduledVisit,
   type VisitTotals,
+  type WeeklySchedule,
 } from "./scheduling";
 import { getPricingRules, zoneFeeForDistance } from "./visits.server";
+
 
 export type QuoteItemInput = { serviceId: string; quantity: number };
 
