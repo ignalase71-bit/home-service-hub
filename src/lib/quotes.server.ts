@@ -125,31 +125,6 @@ export const computeQuote = async (input: {
     };
   });
 
-  const expressAvailable = services.some((s) => s.express_available);
-  const expressActive = input.express && expressAvailable;
-
-  // Express = profesionales/equipos distintos necesarios × tarifa Express.
-  const professionals = await loadProfessionalCapabilities(db, {
-    expressOnly: expressActive,
-  });
-  const required = computeRequiredProfessionals(
-    [...new Set(ids)],
-    professionals,
-  );
-  const professionalsRequired = Math.max(expressActive ? 1 : 0, required.count);
-  const expressTotal = expressActive
-    ? round2(professionalsRequired * Number(rules.expressFee))
-    : 0;
-
-  const totals = computeVisitTotals(
-    lines.map((l) => ({
-      base_price: l.unitPrice,
-      quantity: l.quantity,
-      express: l.express,
-    })),
-    { distanceFee: zone.fee, rules, expressOverride: expressTotal },
-  );
-
   const durationMinutes = computeVisitDuration(
     input.items.map((item) => {
       const service = services.find((s) => s.id === item.serviceId)!;
@@ -161,18 +136,139 @@ export const computeQuote = async (input: {
     }),
   );
 
+  const uniqueIds = [...new Set(ids)];
+  const catalogAllowsExpress = services.every((s) => s.express_available);
+
+  // Profesionales/equipos necesarios (para el importe y para el nº de líneas).
+  const allProfessionals = await loadProfessionalCapabilities(db);
+  const required = computeRequiredProfessionals(uniqueIds, allProfessionals);
+
+  // El Express solo se puede contratar si (1) todos los trabajos elegidos
+  // están cubiertos por profesionales habilitados para Express y (2) existe
+  // hueco real en las próximas 24 h para todos ellos.
+  const feasibility = catalogAllowsExpress
+    ? await checkExpressFeasibility(db, { serviceIds: uniqueIds, durationMinutes })
+    : {
+        eligible: false,
+        reason: "No disponible para estos trabajos",
+        professionalsRequired: required.count,
+      };
+
+  const expressAvailable = feasibility.eligible;
+  const expressActive = input.express && expressAvailable;
+  const professionalsRequired = expressActive
+    ? Math.max(1, feasibility.professionalsRequired)
+    : required.count;
+  const expressTotal = expressActive
+    ? round2(professionalsRequired * Number(rules.expressFee))
+    : 0;
+
+  const totals = computeVisitTotals(
+    lines.map((l) => ({
+      base_price: l.unitPrice,
+      quantity: l.quantity,
+      express: expressActive && l.express,
+    })),
+    { distanceFee: zone.fee, rules, expressOverride: expressTotal },
+  );
+
   return {
-    lines,
+    lines: lines.map((l) => ({ ...l, express: expressActive && l.express })),
     totals,
     durationMinutes,
     zoneName: zone.zoneName,
     distanceFee: zone.fee,
-    express: input.express,
+    express: expressActive,
     expressAvailable,
-    professionalsRequired: expressActive ? professionalsRequired : required.count,
+    expressUnavailableReason: expressAvailable ? null : feasibility.reason,
+    professionalsRequired,
   };
-
 };
+
+/**
+ * Comprueba que el Express es realmente contratable: cobertura de todos los
+ * tipos de trabajo por profesionales habilitados para Express y hueco libre
+ * en las próximas 24 horas en la agenda de cada uno de ellos.
+ */
+export const checkExpressFeasibility = async (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  db: any,
+  params: { serviceIds: string[]; durationMinutes: number },
+): Promise<{ eligible: boolean; reason: string | null; professionalsRequired: number }> => {
+  const expressPros = await loadProfessionalCapabilities(db, { expressOnly: true });
+  const cover = computeRequiredProfessionals(params.serviceIds, expressPros);
+
+  if (cover.unassignedServiceIds.length > 0 || cover.professionalIds.length === 0) {
+    return {
+      eligible: false,
+      reason: "No hay profesionales disponibles para este trabajo en 24 horas",
+      professionalsRequired: cover.count,
+    };
+  }
+
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const nowTime = toTime(now.getUTCHours() * 60 + now.getUTCMinutes());
+  const limitDate = addDays(today, 1);
+
+  const [installersRes, schedulesRes, blocksRes, visitsRes] = await Promise.all([
+    db.from("installers").select("*").eq("active", true).eq("express_enabled", true),
+    db.from("installer_schedules").select("*"),
+    db
+      .from("installer_blocks")
+      .select("*")
+      .lte("start_date", limitDate)
+      .gte("end_date", today),
+    db
+      .from("visits")
+      .select("id, installer_id, visit_date, start_time, end_time, status")
+      .gte("visit_date", today)
+      .lte("visit_date", limitDate)
+      .neq("status", "cancelled"),
+  ]);
+
+  const installers: InstallerLite[] = (installersRes.data ?? [])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .map((i: any) => ({
+      id: i.id as string,
+      name: i.name as string,
+      specialties: (i.specialties ?? []) as string[],
+      zones: (i.zones ?? []) as string[],
+      max_visit_minutes: i.max_visit_minutes as number,
+      express_enabled: i.express_enabled as boolean,
+      active: i.active as boolean,
+    }))
+    .filter((i: InstallerLite) => cover.professionalIds.includes(i.id));
+
+  const schedules = (schedulesRes.data ?? []) as WeeklySchedule[];
+  const blocks = (blocksRes.data ?? []) as Block[];
+  const visits = (visitsRes.data ?? []) as ScheduledVisit[];
+
+  const withSlot = new Set<string>();
+  for (const date of [today, limitDate]) {
+    const slots = generateSlotsForDate({
+      date,
+      durationMinutes: params.durationMinutes,
+      installers,
+      schedules,
+      blocks,
+      visits,
+      stepMinutes: 30,
+      notBefore: { date: today, time: nowTime },
+    }).filter((slot) =>
+      date === limitDate ? toMinutes(slot.startTime) <= toMinutes(nowTime) : true,
+    );
+    for (const slot of slots) withSlot.add(slot.installerId);
+  }
+
+  const allFree = cover.professionalIds.every((id) => withSlot.has(id));
+  return {
+    eligible: allFree,
+    reason: allFree ? null : "Sin huecos libres en las próximas 24 horas",
+    professionalsRequired: cover.count,
+  };
+};
+
 
 export type CustomerInput = {
   name: string;
