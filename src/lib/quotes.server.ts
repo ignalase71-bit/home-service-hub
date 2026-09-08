@@ -198,13 +198,21 @@ export const checkExpressFeasibility = async (
   const expressPros = await loadProfessionalCapabilities(db, { expressOnly: true });
   const cover = computeRequiredProfessionals(params.serviceIds, expressPros);
 
-  if (cover.unassignedServiceIds.length > 0 || cover.professionalIds.length === 0) {
+  if (expressPros.length === 0) {
     return {
       eligible: false,
       reason: "No hay profesionales disponibles para este trabajo en 24 horas",
       professionalsRequired: cover.count,
     };
   }
+
+  // Cobertura completa: exigimos hueco a cada profesional necesario.
+  // Cobertura parcial o sin tipos de trabajo configurados: fallback seguro,
+  // basta con que algún profesional Express tenga hueco en 24 h.
+  const fullyCovered =
+    cover.unassignedServiceIds.length === 0 && cover.professionalIds.length > 0;
+  const targetIds = fullyCovered ? cover.professionalIds : expressPros.map((p) => p.id);
+
 
   const now = new Date();
   const today = now.toISOString().slice(0, 10);
