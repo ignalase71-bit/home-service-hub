@@ -269,12 +269,15 @@ export const checkExpressFeasibility = async (
     for (const slot of slots) withSlot.add(slot.installerId);
   }
 
-  const allFree = cover.professionalIds.every((id) => withSlot.has(id));
+  const free = fullyCovered
+    ? targetIds.every((id) => withSlot.has(id))
+    : withSlot.size > 0;
   return {
-    eligible: allFree,
-    reason: allFree ? null : "Sin huecos libres en las próximas 24 horas",
-    professionalsRequired: cover.count,
+    eligible: free,
+    reason: free ? null : "Sin huecos libres en las próximas 24 horas",
+    professionalsRequired: Math.max(1, cover.count),
   };
+
 };
 
 
