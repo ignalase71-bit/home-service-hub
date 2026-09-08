@@ -246,7 +246,7 @@ export const checkExpressFeasibility = async (
       express_enabled: i.express_enabled as boolean,
       active: i.active as boolean,
     }))
-    .filter((i: InstallerLite) => cover.professionalIds.includes(i.id));
+    .filter((i: InstallerLite) => targetIds.includes(i.id));
 
   const schedules = (schedulesRes.data ?? []) as WeeklySchedule[];
   const blocks = (blocksRes.data ?? []) as Block[];
