@@ -198,13 +198,21 @@ export const checkExpressFeasibility = async (
   const expressPros = await loadProfessionalCapabilities(db, { expressOnly: true });
   const cover = computeRequiredProfessionals(params.serviceIds, expressPros);
 
-  if (cover.unassignedServiceIds.length > 0 || cover.professionalIds.length === 0) {
+  if (expressPros.length === 0) {
     return {
       eligible: false,
       reason: "No hay profesionales disponibles para este trabajo en 24 horas",
       professionalsRequired: cover.count,
     };
   }
+
+  // Cobertura completa: exigimos hueco a cada profesional necesario.
+  // Cobertura parcial o sin tipos de trabajo configurados: fallback seguro,
+  // basta con que algún profesional Express tenga hueco en 24 h.
+  const fullyCovered =
+    cover.unassignedServiceIds.length === 0 && cover.professionalIds.length > 0;
+  const targetIds = fullyCovered ? cover.professionalIds : expressPros.map((p) => p.id);
+
 
   const now = new Date();
   const today = now.toISOString().slice(0, 10);
@@ -238,7 +246,7 @@ export const checkExpressFeasibility = async (
       express_enabled: i.express_enabled as boolean,
       active: i.active as boolean,
     }))
-    .filter((i: InstallerLite) => cover.professionalIds.includes(i.id));
+    .filter((i: InstallerLite) => targetIds.includes(i.id));
 
   const schedules = (schedulesRes.data ?? []) as WeeklySchedule[];
   const blocks = (blocksRes.data ?? []) as Block[];
@@ -261,12 +269,15 @@ export const checkExpressFeasibility = async (
     for (const slot of slots) withSlot.add(slot.installerId);
   }
 
-  const allFree = cover.professionalIds.every((id) => withSlot.has(id));
+  const free = fullyCovered
+    ? targetIds.every((id) => withSlot.has(id))
+    : withSlot.size > 0;
   return {
-    eligible: allFree,
-    reason: allFree ? null : "Sin huecos libres en las próximas 24 horas",
-    professionalsRequired: cover.count,
+    eligible: free,
+    reason: free ? null : "Sin huecos libres en las próximas 24 horas",
+    professionalsRequired: Math.max(1, cover.count),
   };
+
 };
 
 
